@@ -18,7 +18,7 @@ from rasa.importers.rasa import RasaFileImporter
 
 from rasa.importers.multi_project import MultiProjectImporter
 
-from rasa.nlu.constants import MESSAGE_ACTION_NAME, MESSAGE_INTENT_NAME
+from rasa.nlu.constants import MESSAGE_ACTION_NAME, MESSAGE_INTENT_NAME, MESSAGE_IS_E2E
 from rasa.nlu.training_data import Message
 
 
@@ -213,9 +213,21 @@ async def test_import_nlu_training_data_from_e2e_stories(project: Text):
     # Check if the NLU training data was added correctly from the story training data
     expected_additional_messages = [
         Message("greet_from_stories", data={MESSAGE_INTENT_NAME: "greet_from_stories"}),
-        Message("", data={MESSAGE_ACTION_NAME: "utter_greet_from_stories"}),
+        Message(
+            "utter_greet_from_stories",
+            data={
+                MESSAGE_ACTION_NAME: "utter_greet_from_stories",
+                MESSAGE_IS_E2E: False,
+            },
+        ),
         Message("how are you doing?", data={MESSAGE_INTENT_NAME: "greet_from_stories"}),
-        Message("Hi Joey.", data={MESSAGE_ACTION_NAME: "utter_greet_from_stories"}),
+        Message(
+            "Hi Joey.",
+            data={
+                MESSAGE_ACTION_NAME: "utter_greet_from_stories",
+                MESSAGE_IS_E2E: True,
+            },
+        ),
     ]
 
     assert all(m in nlu_data.training_examples for m in expected_additional_messages)
@@ -243,7 +255,9 @@ async def test_import_nlu_training_data_with_default_actions(project: Text):
 
     extended_training_data = await importer.get_nlu_data()
     assert all(
-        Message("", data={MESSAGE_ACTION_NAME: action_name})
+        Message(
+            action_name, data={MESSAGE_ACTION_NAME: action_name, MESSAGE_IS_E2E: False}
+        )
         in extended_training_data.training_examples
         for action_name in action.default_action_names()
     )

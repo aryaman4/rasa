@@ -70,3 +70,4 @@ FEATURIZER_CLASS_ALIAS = "alias"
 
 MESSAGE_ACTION_NAME = "action_name"
 MESSAGE_INTENT_NAME = "intent_name"
+MESSAGE_IS_E2E = "is_e2e"
